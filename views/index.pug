@@ -1,0 +1,73 @@
+script(src='/js/familytree.js')
+
+link(rel="icon" href="/favicon.png" type="image/x-icon")
+
+#tree
+
+script.
+
+  var debug = true;
+  if(debug)
+  {
+    var nodeTreeMenu = true;
+    var readOnly= false;
+    var nodesToModify = [];
+  }else{
+    var nodesToModify = ["_ft_mother", "_ft_father", "_ft_partner", "_ft_child_son_0", "_ft_child_daughter_0", "_ft_child_son_1", "_ft_child_daughter_1"];
+    var nodeTreeMenu = null;
+    var readOnly= true;
+  }
+
+  var data = JSON.parse(!{JSON.stringify(json)});
+
+  let family = new FamilyTree(document.getElementById("tree"), {         
+    nodeTreeMenu:nodeTreeMenu,
+    template: "hugo",            
+    nodeBinding: {
+        field_0: 'name',
+        field_1: 'born',
+        img_0: 'photo'
+    },
+    editForm: {
+        titleBinding: "name",
+        readOnly: readOnly,
+        photoBinding: "photo",
+        addMoreBtn: 'Add element',
+        addMore: 'Add more elements',
+        addMoreFieldName: 'Element name',
+        generateElementsFromFields: false,
+        elements: [
+            { type: 'textbox', label: 'Full Name', binding: 'name' },
+            { type: 'textbox', label: 'Email Address', binding: 'email' },
+            [
+                { type: 'textbox', label: 'Phone', binding: 'phone' },
+                { type: 'date', label: 'Date Of Birth', binding: 'born' }
+            ],
+            [                
+                { type: 'textbox', label: 'City', binding: 'city' },
+                { type: 'textbox', label: 'Photo Url', binding: 'photo', btn: 'Upload' },
+            ],
+            
+        ]
+    },    
+  });   
+
+  family.onUpdateNode((args) => {
+    fetch('/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(args)
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
+  //return false; to cancel the operation
+  });  
+  
+
+
+
+  family.load(data)  
+
